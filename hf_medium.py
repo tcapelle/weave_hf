@@ -41,7 +41,11 @@ if __name__ == "__main__":
     args = simple_parsing.parse(Args)
 
     weave.init(args.project)
+    # we load the model outside of the class, no need to validate the Pydantic attributes
     model = AutoModelForCausalLM.from_pretrained(args.model_id, torch_dtype="auto", device_map=args.device)
     tokenizer = AutoTokenizer.from_pretrained(args.model_id)
+
+    # we instantiate the model with the transformers.model and tokenizer already loaded
+    # no tracking of the loading params like device, torch_dtype, etc...
     model = FineTunedModelHF(model=model, tokenizer=tokenizer)
     print(model.predict([{"role": "user", "content": args.prompt}]))

@@ -15,8 +15,11 @@ class Args:
 
 args = simple_parsing.parse(Args)
 
+# we define the pipeline outside of the op, so that we don't reload the model each time
 pipe = pipeline("text-generation", model=args.model_id, device_map=args.device, torch_dtype="auto")
 
+
+# simple decoration of the pipeline.__call__ method, ideally we would want a callback to trace the prompt, tokenizer and decode
 @weave.op()
 def simple_generate(pipe, prompt:str, temperature: float=0.7, max_new_tokens: int=64, do_sample: bool=True, return_full_text: bool=False) -> str:
     messages = [
